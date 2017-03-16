@@ -16,16 +16,16 @@ class Point2D {
 }
 
 class Corners {
-    topLeft: Point2D = new Point2D(0, 0);
-    topRight: Point2D = new Point2D(1, 0);
-    bottomLeft: Point2D = new Point2D(0, 1);
-    bottomRight: Point2D = new Point2D(1, 1);
-    corners: Point2D[] = [this.topLeft, this.topRight, this.bottomLeft, this.bottomRight];
+    corners: Point2D[] = [
+        new Point2D(0, 0),
+        new Point2D(1, 0),
+        new Point2D(0, 1),
+        new Point2D(1, 1)
+    ]
     update(p: Point2D) {
         console.log("Called Corners update", p);
         let minDist = 2;
         let minIndex = 0;
-        // for (var i = 0; i < this.corners.length; i++) {
         for (let i in this.corners) {
             let dist = p.dist(this.corners[i]);
             if (dist < minDist) {
@@ -34,6 +34,7 @@ class Corners {
             }
         }
         console.log(minIndex, minDist);
+        this.corners[minIndex] = p;
     }
 }
 
@@ -41,10 +42,23 @@ var corners;
 
 let loadStartImage=function() {
     corners = new Corners();
+    console.log("Getting image");
     $.get("http://localhost:5000/givemejpegurls", function(data) {
-        $(".currentImage").attr("src", "http://localhost:5000" + data[0]);
-        setImageClickFunction();
+        console.log("Got image");
+        let imageURL = "http://localhost:5000" + data[0];
+        let c = <HTMLCanvasElement>document.getElementById("imgCanvas");
+        let ctx = c.getContext('2d');
+        let img = new Image();
+        // img.src = "/DJI_0117.JPG";
+        img.src = imageURL;
+        ctx.drawImage(img, 0, 0);
+        // ctx.beginPath();
+        // ctx.rect(10, 10, 100, 100);
+        // ctx.fillStyle = "blue";
+        // ctx.fill();
     });
+    setupCanvas();
+    // });
 };
 
 let getElementRelativeCoords = function(item, event) {
@@ -66,9 +80,10 @@ let getElementNormCoords = function(item, event) {
     return new Point2D(normX, normY);
 }
 
-let setImageClickFunction = function() {
-    let item = document.querySelector(".currentImage");
-    $(".currentImage").click(function(event) {
+let setupCanvas = function() {
+
+    let item = document.querySelector("#imgCanvas");
+    $("#imgCanvas").click(function(event) {
         let normCoords = getElementNormCoords(item, event);
         corners.update(normCoords);
         console.log(normCoords.x + ',' + normCoords.y);
