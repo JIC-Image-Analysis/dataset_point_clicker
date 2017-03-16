@@ -22,6 +22,17 @@ class Corners {
         new Point2D(0, 1),
         new Point2D(1, 1)
     ]
+    constructor() {
+        this.drawOnCanvas();
+    }
+    drawOnCanvas() {
+        let c = <HTMLCanvasElement>document.getElementById("pointsCanvas");
+        let ctx = c.getContext('2d');
+        ctx.clearRect(0, 0, c.width, c.height);
+        for (let c of this.corners) {
+            drawCircle(c);
+        }
+    }
     update(p: Point2D) {
         console.log("Called Corners update", p);
         let minDist = 2;
@@ -35,10 +46,20 @@ class Corners {
         }
         console.log(minIndex, minDist);
         this.corners[minIndex] = p;
+        this.drawOnCanvas();
     }
 }
 
 var corners;
+
+let drawCircle = function(p: Point2D) {
+    let c = <HTMLCanvasElement>document.getElementById("pointsCanvas");
+    let ctx = c.getContext('2d');
+    ctx.beginPath();
+    ctx.arc(p.x * c.width, p.y * c.height, 5, 0, 2*Math.PI);
+    ctx.fillStyle = 'red';
+    ctx.fill();
+}
 
 let loadStartImage=function() {
     corners = new Corners();
@@ -51,11 +72,7 @@ let loadStartImage=function() {
         let img = new Image();
         // img.src = "/DJI_0117.JPG";
         img.src = imageURL;
-        ctx.drawImage(img, 0, 0);
-        // ctx.beginPath();
-        // ctx.rect(10, 10, 100, 100);
-        // ctx.fillStyle = "blue";
-        // ctx.fill();
+        ctx.drawImage(img, 0, 0, 800, 600);
     });
     setupCanvas();
     // });
@@ -83,7 +100,7 @@ let getElementNormCoords = function(item, event) {
 let setupCanvas = function() {
 
     let item = document.querySelector("#imgCanvas");
-    $("#imgCanvas").click(function(event) {
+    $("#pointsCanvas").click(function(event) {
         let normCoords = getElementNormCoords(item, event);
         corners.update(normCoords);
         console.log(normCoords.x + ',' + normCoords.y);

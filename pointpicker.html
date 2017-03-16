@@ -12,8 +12,11 @@
 
 <body>
 
-<div class="viewpane">
-    <canvas id="imgCanvas" width="800" height="600"></canvas>
+<div class="viewpane" style="position: relative">
+    <canvas id="imgCanvas" width="800" height="600"
+    style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+    <canvas id="pointsCanvas" width="800" height="600"
+    style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
 <!--     <img class="currentImage" width="80%" height="80%" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt=""> -->
 </div>
 
