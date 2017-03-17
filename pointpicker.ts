@@ -1,3 +1,7 @@
+
+var currentCorners;
+var annState;
+
 class Point2D {
     x: number;
     y: number;
@@ -12,6 +16,39 @@ class Point2D {
     }
     magnitude() {
         return Math.sqrt(this.x * this.x + this.y * this.y);
+    }
+}
+
+class AnnotationState {
+    identifiers: string[];
+    currentIndex: number = 0;
+    imageURLprefix: string = "http://localhost:5000/dataset/cad_tilling_2016/item/";
+    constructor(identifiers: string[]) {
+        this.identifiers = identifiers;
+    }
+    currentImageURL() : URL {
+        return new URL(this.imageURLprefix + this.identifiers[this.currentIndex]);
+    }
+    nextImageURL() : URL {
+        this.currentIndex += 1;
+        return this.currentImageURL();
+    }
+    persistInOverlay(corners : Corners) {
+        let postURL = this.imageURLprefix + this.identifiers[this.currentIndex] + '/update_coords';
+        console.log('persistInOverlay', corners.asJSONString(), postURL);
+        $.ajax({
+            type: 'POST',
+            url: postURL,
+            data: corners.asJSONString(),
+            success: function(data) {
+                console.log("Success!");
+                let imageURL = annState.nextImageURL();
+                console.log(imageURL);
+                drawImageFromURL(imageURL);
+                console.log("end of success");
+            },
+            contentType: "application/json"
+        });
     }
 }
 
@@ -48,9 +85,16 @@ class Corners {
         this.corners[minIndex] = p;
         this.drawOnCanvas();
     }
+    asJSONString() {
+        // return JSON.stringify("hello");
+        return JSON.stringify({ "topLeft": this.corners[0],
+                                "topRight": this.corners[1],
+                                "bottomLeft": this.corners[2],
+                                "bottomRight": this.corners[3]})
+    }
+
 }
 
-var corners;
 
 let drawCircle = function(p: Point2D) {
     let c = <HTMLCanvasElement>document.getElementById("pointsCanvas");
@@ -61,21 +105,34 @@ let drawCircle = function(p: Point2D) {
     ctx.fill();
 }
 
-let loadStartImage=function() {
-    corners = new Corners();
-    console.log("Getting image");
-    $.get("http://localhost:5000/givemejpegurls", function(data) {
-        console.log("Got image");
-        let imageURL = "http://localhost:5000" + data[0];
-        let c = <HTMLCanvasElement>document.getElementById("imgCanvas");
-        let ctx = c.getContext('2d');
-        let img = new Image();
-        // img.src = "/DJI_0117.JPG";
-        img.src = imageURL;
+let drawImageFromURL = function(imageURL: URL) {
+    let c = <HTMLCanvasElement>document.getElementById("imgCanvas");
+    let ctx = c.getContext('2d');
+    ctx.clearRect(0, 0, c.width, c.height);
+    let img = new Image();
+    img.src = String(imageURL);
+    img.addEventListener('load', function() {
         ctx.drawImage(img, 0, 0, 800, 600);
     });
+}
+
+let loadStartImage=function() {
+    currentCorners = new Corners();
+    console.log("Getting image");
+    $.get("http://localhost:5000/givemejpegurls", function(data) {
+        console.log("Got data");
+        annState = new AnnotationState(data);
+        let imageURL = annState.currentImageURL();
+        drawImageFromURL(imageURL);
+    });
+
     setupCanvas();
-    // });
+
+    document.addEventListener('keydown', function(event) {
+        if (event.keyCode == 39) {
+            annState.persistInOverlay(currentCorners);
+        }
+    });
 };
 
 let getElementRelativeCoords = function(item, event) {
@@ -102,7 +159,7 @@ let setupCanvas = function() {
     let item = document.querySelector("#imgCanvas");
     $("#pointsCanvas").click(function(event) {
         let normCoords = getElementNormCoords(item, event);
-        corners.update(normCoords);
+        currentCorners.update(normCoords);
         console.log(normCoords.x + ',' + normCoords.y);
     });
 };
