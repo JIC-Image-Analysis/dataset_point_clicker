@@ -1,6 +1,6 @@
 
 var currentCorners;
-var annState;
+var appState;
 
 class Point2D {
     x: number;
@@ -19,37 +19,43 @@ class Point2D {
     }
 }
 
-class AnnotationState {
-    identifiers: string[];
+class AppState {
+    items: any;
     currentIndex: number = 0;
-    imageURLprefix: string = "http://localhost:5000/dataset/cad_tilling_2016/item/";
-    constructor(identifiers: string[]) {
-        this.identifiers = identifiers;
+    server: string = "http://localhost:5000";
+    constructor(items: string[]) {
+        this.items = items;
     }
     currentImageURL() : URL {
-        return new URL(this.imageURLprefix + this.identifiers[this.currentIndex]);
+        let cur_img_url = new URL(this.server
+                                  + this.items[this.currentIndex]["_links"]["self"]["href"]
+                                  + "/raw");
+        console.log("Current image url: " + cur_img_url);
+        return cur_img_url;
     }
     nextImageURL() : URL {
         this.currentIndex += 1;
         return this.currentImageURL();
     }
     persistInOverlay(corners : Corners) {
-        let postURL = this.imageURLprefix + this.identifiers[this.currentIndex] + '/update_coords';
-        console.log('persistInOverlay', corners.asJSONString(), postURL);
-        $.ajax({
-            type: 'POST',
-            url: postURL,
-            data: corners.asJSONString(),
-            success: function(data) {
-                console.log("Success!");
-                let imageURL = annState.nextImageURL();
-                console.log(imageURL);
-                drawImageFromURL(imageURL);
-                console.log("end of success");
-            },
-            contentType: "application/json"
-        });
-    }
+      let putURL = this.server
+                    + this.items[this.currentIndex]["_links"]["self"]["href"]
+                    + '/quadrilateral_points';
+      console.log('persistInOverlay', corners.asJSONString(), putURL);
+      $.ajax({
+          type: 'PUT',
+          url: putURL,
+          data: corners.asJSONString(),
+          success: function(data) {
+              console.log("Success!");
+              let imageURL = appState.nextImageURL();
+              console.log(imageURL);
+              drawImageFromURL(imageURL);
+              console.log("end of success");
+          },
+          contentType: "application/json"
+      });
+  }
 }
 
 class Corners {
@@ -119,10 +125,9 @@ let drawImageFromURL = function(imageURL: URL) {
 let loadStartImage=function() {
     currentCorners = new Corners();
     console.log("Getting image");
-    $.get("http://localhost:5000/givemejpegurls", function(data) {
-        console.log("Got data");
-        annState = new AnnotationState(data);
-        let imageURL = annState.currentImageURL();
+    $.get("http://localhost:5000/items", function(data) {
+        appState = new AppState(data["_embedded"]["items"]);
+        let imageURL = appState.currentImageURL();
         drawImageFromURL(imageURL);
     });
 
@@ -130,7 +135,7 @@ let loadStartImage=function() {
 
     document.addEventListener('keydown', function(event) {
         if (event.keyCode == 39) {
-            annState.persistInOverlay(currentCorners);
+            appState.persistInOverlay(currentCorners);
         }
     });
 };

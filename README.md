@@ -17,3 +17,9 @@ or (to make it work):
 
     ~/.node/bin/http-server -p 8000 --cors
 
+
+## Misc
+
+```
+curl -X PUT http://localhost:5000/overlays/quadrilateral_points
+```
