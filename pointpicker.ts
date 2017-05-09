@@ -40,6 +40,13 @@ class AppState {
         console.log(progress_str);
         document.querySelector("#progressBar").innerHTML = progress_str;
     }
+    is_done() : boolean {
+        if (this.currentIndex + 1 == this.items.length) {
+            document.querySelector("#progressBar").innerHTML = "Done!  :)";
+            return true;
+        }
+        return false;
+    }
     nextImageURL() : URL {
         this.currentIndex += 1;
         this.updateProgressBar();
@@ -143,7 +150,7 @@ let loadStartImage=function() {
     setupCanvas();
 
     document.addEventListener('keydown', function(event) {
-        if (event.keyCode == 39) {
+        if (event.keyCode == 39 &&  !appState.is_done()) {
             appState.persistInOverlay(currentCorners);
         }
     });
