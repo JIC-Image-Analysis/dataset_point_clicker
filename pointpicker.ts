@@ -42,7 +42,7 @@ class AppState {
     }
     is_done() : boolean {
         if (this.currentIndex + 1 == this.items.length) {
-            document.querySelector("#progressBar").innerHTML = "Done!  :)";
+            document.querySelector("#progressBar").innerHTML = "Done!  &#128512;";
             return true;
         }
         return false;
