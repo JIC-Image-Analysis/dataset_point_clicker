@@ -31,16 +31,24 @@ class AppState {
                                   + this.items[this.currentIndex]["_links"]["self"]["href"]
                                   + "/raw");
         console.log("Current image url: " + cur_img_url);
+        this.updateProgressBar();
         return cur_img_url;
+    }
+    updateProgressBar() {
+        let human_index = this.currentIndex + 1;
+        let progress_str = "Progress: " + human_index + "/" + this.items.length;
+        console.log(progress_str);
+        document.querySelector("#progressBar").innerHTML = progress_str;
     }
     nextImageURL() : URL {
         this.currentIndex += 1;
+        this.updateProgressBar();
         return this.currentImageURL();
     }
     persistInOverlay(corners : Corners) {
       let putURL = this.server
                     + "/overlays"
-                    + '/quadrilateral_points'
+                    + '/quadrilateral_points/'
                     + this.items[this.currentIndex]["identifier"];
       console.log('persistInOverlay', corners.asJSONString(), putURL);
       $.ajax({
