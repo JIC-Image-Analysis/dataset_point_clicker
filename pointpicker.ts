@@ -39,8 +39,9 @@ class AppState {
     }
     persistInOverlay(corners : Corners) {
       let putURL = this.server
-                    + this.items[this.currentIndex]["_links"]["self"]["href"]
-                    + '/quadrilateral_points';
+                    + "/overlays"
+                    + '/quadrilateral_points'
+                    + this.items[this.currentIndex]["identifier"];
       console.log('persistInOverlay', corners.asJSONString(), putURL);
       $.ajax({
           type: 'PUT',
