@@ -25,13 +25,13 @@ class AppState {
     server: string = "http://localhost:5000";
     constructor(items: string[]) {
         this.items = items;
+        this.updateProgressBar();
     }
     currentImageURL() : URL {
         let cur_img_url = new URL(this.server
                                   + this.items[this.currentIndex]["_links"]["self"]["href"]
                                   + "/raw");
         console.log("Current image url: " + cur_img_url);
-        this.updateProgressBar();
         return cur_img_url;
     }
     updateProgressBar() {
@@ -49,7 +49,6 @@ class AppState {
     }
     nextImageURL() : URL {
         this.currentIndex += 1;
-        this.updateProgressBar();
         return this.currentImageURL();
     }
     persistInOverlay(corners : Corners) {
@@ -67,6 +66,7 @@ class AppState {
               let imageURL = appState.nextImageURL();
               console.log(imageURL);
               drawImageFromURL(imageURL);
+              appState.updateProgressBar();
               console.log("end of success");
           },
           contentType: "application/json"
