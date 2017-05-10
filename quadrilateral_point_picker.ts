@@ -196,11 +196,13 @@ let setupCanvas = function() {
 };
 
 let setupKeyBindings = function() {
+    // Right arrow.
     document.addEventListener('keydown', function(event) {
         if (event.keyCode == 39 &&  !appState.is_done()) {
             appState.persistInOverlay(corners);
         }
     });
+    // Left arrow.
     document.addEventListener('keydown', function(event) {
         if (event.keyCode == 37 &&  !appState.is_done()) {
             appState.prev();
