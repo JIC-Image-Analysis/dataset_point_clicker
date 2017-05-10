@@ -84,8 +84,10 @@ class AppState {
                   appState.updateCorners();
               } else {
                   // Done.
-                  document.querySelector("#progressBar").innerHTML = "Done!  &#128512;";
                   appState.done = true;
+                  document.querySelector("#progressBar").innerHTML = "Done!  &#128512;";
+                  document.querySelector("#workArea").innerHTML = "";
+                  document.querySelector("#help").innerHTML = "Do some post processing...";
               }
           },
           contentType: "application/json"
