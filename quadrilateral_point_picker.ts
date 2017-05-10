@@ -94,7 +94,15 @@ class AppState {
           },
           contentType: "application/json"
       });
-  }
+    }
+    prev() {
+        if (this.currentIndex > 0) {
+            console.log("previous");
+            this.currentIndex -= 1;
+            drawImageFromURL(this.currentImageURL());
+            this.updateCorners();
+        }
+    }
 }
 
 let drawImageFromURL = function(imageURL: URL) {
@@ -191,6 +199,11 @@ let setupKeyBindings = function() {
     document.addEventListener('keydown', function(event) {
         if (event.keyCode == 39 &&  !appState.is_done()) {
             appState.persistInOverlay(corners);
+        }
+    });
+    document.addEventListener('keydown', function(event) {
+        if (event.keyCode == 37 &&  !appState.is_done()) {
+            appState.prev();
         }
     });
 }
