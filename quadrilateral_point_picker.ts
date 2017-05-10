@@ -18,6 +18,7 @@ class AppState {
     identifiers: string[];
     currentIndex: number = 0;
     server: string = "http://localhost:5000";
+    done: boolean = false;
     constructor(data) {
         this.identifiers = data.map(function(obj){return obj["identifier"];});
         console.log("Identifiers: " + this.identifiers);
@@ -62,17 +63,6 @@ class AppState {
         console.log(progress_str);
         document.querySelector("#progressBar").innerHTML = progress_str;
     }
-    is_done(): boolean {
-        if (this.currentIndex == this.identifiers.length) {
-            document.querySelector("#progressBar").innerHTML = "Done!  &#128512;";
-            return true;
-        }
-        return false;
-    }
-    nextImageURL(): URL {
-        this.currentIndex += 1;
-        return this.currentImageURL();
-    }
     persistInOverlay(corners: MultiPoints) {
       let putURL = this.server
                     + "/overlays"
@@ -85,21 +75,31 @@ class AppState {
           data: JSON.stringify(corners),
           success: function(data) {
               console.log("Success!");
-              let imageURL = appState.nextImageURL();
-              console.log(imageURL);
-              drawImageFromURL(imageURL);
+              appState.currentIndex += 1;
               appState.updateProgressBar();
-              appState.updateCorners();
-              console.log("end of success");
+              if (appState.currentIndex < appState.identifiers.length) {
+                  let imageURL = appState.currentImageURL();
+                  console.log(imageURL);
+                  drawImageFromURL(imageURL);
+                  appState.updateCorners();
+              } else {
+                  // Done.
+                  document.querySelector("#progressBar").innerHTML = "Done!  &#128512;";
+                  appState.done = true;
+              }
           },
           contentType: "application/json"
       });
+    }
+    next() {
+        this.persistInOverlay(corners);
     }
     prev() {
         if (this.currentIndex > 0) {
             console.log("previous");
             this.currentIndex -= 1;
             drawImageFromURL(this.currentImageURL());
+            this.updateProgressBar();
             this.updateCorners();
         }
     }
@@ -121,6 +121,7 @@ let initialiseAppState = function() {
         appState = new AppState(data["_embedded"]["items"]);
         let imageURL = appState.currentImageURL();
         drawImageFromURL(imageURL);
+        appState.updateProgressBar();
     });
 }
 
@@ -196,15 +197,13 @@ let setupCanvas = function() {
 };
 
 let setupKeyBindings = function() {
-    // Right arrow.
     document.addEventListener('keydown', function(event) {
-        if (event.keyCode == 39 &&  !appState.is_done()) {
-            appState.persistInOverlay(corners);
+        // Right arrow.
+        if (event.keyCode == 39 &&  !appState.done) {
+            appState.next();
         }
-    });
-    // Left arrow.
-    document.addEventListener('keydown', function(event) {
-        if (event.keyCode == 37 &&  !appState.is_done()) {
+        // Left arrow.
+        if (event.keyCode == 37 &&  !appState.done) {
             appState.prev();
         }
     });
