@@ -5,6 +5,6 @@
         "target": "es5"
     }, 
     "files": [
-        "pointpicker.ts"
+        "quadrilateral_point_picker.ts"
     ]
 }
