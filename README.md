@@ -17,6 +17,4 @@ npm install http-server -g
 
 ## Starting the point picker
 
-```
-http-server -p 8000 --cors
-```
+Open the ``quadrilateral_point_picker.html`` file in a web browser.
