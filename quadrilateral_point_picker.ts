@@ -14,10 +14,11 @@ let corners:MultiPoints = [
 
 let appState:AppState;
 
+const server = "http://localhost:5000";
+
 class AppState {
     identifiers: string[];
     currentIndex: number = 0;
-    server: string = "http://localhost:5000";
     done: boolean = false;
     constructor(data) {
         this.identifiers = data.map(function(obj){return obj["identifier"];});
@@ -25,7 +26,7 @@ class AppState {
         this.updateCorners();
     }
     currentImageURL(): URL {
-        let cur_img_url = new URL(this.server
+        let cur_img_url = new URL(server
                                   + "/items/"
                                   + this.identifiers[this.currentIndex]
                                   + "/raw");
@@ -33,7 +34,7 @@ class AppState {
         return cur_img_url;
     }
     updateCorners() {
-      let getURL = this.server
+      let getURL = server
                     + "/overlays"
                     + '/quadrilateral_points/'
                     + this.identifiers[this.currentIndex];
@@ -64,7 +65,7 @@ class AppState {
         document.querySelector("#progressBar").innerHTML = progress_str;
     }
     persistInOverlay(corners: MultiPoints) {
-      let putURL = this.server
+      let putURL = server
                     + "/overlays"
                     + '/quadrilateral_points/'
                     + this.identifiers[this.currentIndex];
@@ -211,9 +212,27 @@ let setupKeyBindings = function() {
     });
 }
 
+let createOverlay = function() {
+  let putURL = server
+               + "/overlays"
+               + '/quadrilateral_points';
+  console.log('overlay url: ' + putURL);
+  $.ajax({
+      type: 'PUT',
+      url: putURL,
+      success: function(data) {
+          console.log("overlay created");
+      },
+      error: function(data) {
+          console.log("overlay exists");
+      }
+  });
+}
+
 
 let main = function() {
     console.log("Running main function");
+    createOverlay();
     initialiseAppState();
     setupCanvas();
     drawCorners(corners);

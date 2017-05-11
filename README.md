@@ -4,13 +4,8 @@ Tool to allow clicking on points in an image dataset and recording the results a
 
 ## DataSet serving infrastructure
 
-1. The dataset should be served using [dserve](https://github.com/JIC-CSB/dserve).
+The dataset should be served using [dserve](https://github.com/JIC-CSB/dserve).
 
-2. Before clicking one needs to create an overlay named quadrilateral_points
-
-```
-curl -X PUT http://localhost:5000/overlays/quadrilateral_points
-```
 
 ## Requirements for this project
 
