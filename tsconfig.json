@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "out": "build/pointpicker.js", 
+        "out": "build/app.js", 
         "sourceMap": true, 
         "target": "es5"
     }, 
