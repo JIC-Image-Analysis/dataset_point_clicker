@@ -120,7 +120,7 @@ let drawImageFromURL = function(imageURL: URL) {
 }
 
 let initialiseAppState = function() {
-    $.get("http://localhost:5000/items", function(data) {
+    $.get(server + "/items", function(data) {
         appState = new AppState(data["_embedded"]["items"]);
         let imageURL = appState.currentImageURL();
         drawImageFromURL(imageURL);
