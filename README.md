@@ -18,7 +18,8 @@ npm install http-server -g
 ## Compiling the TypeScript code to JavaScript
 
 ```
-tsc
+export DSERVE_HOSTNAME=cigana
+make
 ```
 
 ## Starting the point picker

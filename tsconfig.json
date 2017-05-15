@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "out": "build/app.js", 
+        "out": "build/pre_app.js", 
         "sourceMap": true, 
         "target": "es5"
     }, 
