@@ -15,6 +15,12 @@ npm install --save-dev @types/jquery
 npm install http-server -g
 ```
 
+## Compiling the TypeScript code to JavaScript
+
+```
+tsc
+```
+
 ## Starting the point picker
 
 Open the ``quadrilateral_point_picker.html`` file in a web browser.
