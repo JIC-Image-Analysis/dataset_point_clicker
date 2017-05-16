@@ -24,4 +24,8 @@ make
 
 ## Starting the point picker
 
-Open the ``quadrilateral_point_picker.html`` file in a web browser.
+```
+bash run_docker.sh
+```
+
+Point a web browser at the URL: http://localhost:8080/
